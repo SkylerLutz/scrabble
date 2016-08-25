@@ -1,0 +1,17 @@
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/UnityEngine.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/UnityEditor.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/UnityEngine.UI.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/UnityEngine.Networking.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Mono.Cecil.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Unity.SerializationLogic.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Unity.DataContract.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/ICSharpCode.NRefactory.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Unity.UNetWeaver.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Unity.UNetWeaver.dll.mdb
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Unity.CecilTools.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Mono.Cecil.Pdb.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Mono.Cecil.Mdb.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Assembly-CSharp.dll.mdb
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/Temp/bin/Debug/Assembly-CSharp.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/obj/Debug/Assembly-CSharp.dll
+/Users/skylerlutz/Desktop/scrabble_3d/Scrabble3d/obj/Debug/Assembly-CSharp.dll.mdb
