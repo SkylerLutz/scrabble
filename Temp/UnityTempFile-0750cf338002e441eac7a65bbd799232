@@ -83,7 +83,13 @@
 -define:UNITY_EDITOR_64
 -define:UNITY_EDITOR_OSX
 -define:UNITY_TEAM_LICENSE
-'Assets/Assets/Scripts/GameController.cs'
-'Assets/Assets/Scripts/Tile.cs'
+'Assets/Assets/Scripts/Configuration/BoardConfiguration.cs'
+'Assets/Assets/Scripts/Configuration/RackConfiguration.cs'
+'Assets/Assets/Scripts/Controllers/BoardController.cs'
+'Assets/Assets/Scripts/Controllers/GameController.cs'
+'Assets/Assets/Scripts/Controllers/RackController.cs'
+'Assets/Assets/Scripts/Controllers/TileMovementController.cs'
+'Assets/Assets/Scripts/Factories/TileFactory.cs'
+'Assets/Assets/Scripts/PrefabScripts/TilePrefab.cs'
 -r:'/Applications/Unity/Unity.app/Contents/Mono/lib/mono/unity/System.Runtime.Serialization.dll'
 -r:'/Applications/Unity/Unity.app/Contents/Mono/lib/mono/unity/System.Xml.Linq.dll'
