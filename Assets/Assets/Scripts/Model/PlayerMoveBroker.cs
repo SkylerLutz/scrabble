@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
-
+using UnityEngine;
 
 public sealed class PlayerMoveBroker {
 
@@ -19,7 +19,7 @@ public sealed class PlayerMoveBroker {
 	public int brokerMove(Player player, AbstractPlayerMove move) {
 		ScrabbleScoringDirection direction = Raycasting.getDirection(move.coordinates);
 
-		if (move.tiles.Count != move.coordinates.Count) {
+		if (move.tiles.Length != move.coordinates.Length) {
 			return -1;
 		}
 		
@@ -29,7 +29,7 @@ public sealed class PlayerMoveBroker {
 		}
 
 		Tile[,] predictedTiles = new Tile[board.dimension,board.dimension];
-		for (int i = 0; i < move.tiles.Count; i++) {
+		for (int i = 0; i < move.tiles.Length; i++) {
 			Tile tile = move.tiles[i];
 			Coordinate coordinate = move.coordinates[i];
 			predictedTiles[coordinate.x,coordinate.y] = tile;
@@ -49,7 +49,7 @@ public sealed class PlayerMoveBroker {
 	}
 	private void commit(Player player, AbstractPlayerMove move) {
 
-		for (int i = 0; i < move.tiles.Count; i++) {
+		for (int i = 0; i < move.tiles.Length; i++) {
 			Tile tile = move.tiles[i];
 			Coordinate coordinate = move.coordinates[i];
 			board.setTile(tile, coordinate.x, coordinate.y);
@@ -58,12 +58,12 @@ public sealed class PlayerMoveBroker {
 		use(player, move.tiles);
 		
 	}
-	private void use(Player player, List<Tile> playedTiles) {
+	private void use(Player player, Tile[] playedTiles) {
 		foreach (Tile play in playedTiles) {
 			bool b = player.tiles.Remove(play);
 			if (!b) {
 				// TODO: Throw a proper exception -- the player didnt have this tile.
-				Environment.Exit(1);
+//				Environment.Exit(1);
 //				System.out.println("Player doesn't have that tile");
 //				System.exit(1);
 			}
@@ -76,6 +76,7 @@ public sealed class PlayerMoveBroker {
 			if (draw == null) {
 				break;
 			}
+			Debug.Log ("replenishing " + draw);
 			player.tiles.Add(draw);
 		}
 	}

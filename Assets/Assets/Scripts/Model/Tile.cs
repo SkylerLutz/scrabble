@@ -1,10 +1,11 @@
 ﻿using System.Collections;
+using System;
 
 public enum TileType{
 	LETTER,
 	WILDCARD
 }
-public sealed class Tile { 
+public sealed class Tile: IEquatable<Tile> { 
 
 	public TileType type;
 	private char letter;
@@ -22,9 +23,9 @@ public sealed class Tile {
 		//		}
 		//		return null; 
 	}       
-	//	public int compareTo(Tile other) { 
-	//		return Character.compare(this.letter, other.letter);
-	//	}       
+	public bool Equals(Tile other) { 
+		return (this.letter == other.letter);
+	}       
 	public override string ToString() { 
 		switch(this.type) {
 		case TileType.LETTER: return "" + this.letter;

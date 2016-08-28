@@ -23,7 +23,7 @@ public sealed class Prediction {
 
 		List<PredictionResult> predictions = new List<PredictionResult>();
 
-		List<List<Tile>> pset = PowerSet.powerset(new List<Tile>(tiles));
+		List<List<Tile>> pset = PowerSet.powerset(tiles);
 		foreach (List<Tile> s in pset) {
 			Permutator<Tile> permutator = new Permutator<Tile>(s.ToArray());
 			Tile[] permutation = null;
@@ -76,28 +76,31 @@ public sealed class Prediction {
 		int dimension = board.dimension;
 		Tile[,] context = new Tile[dimension,dimension];
 		List<Coordinate> placements = new List<Coordinate>();
-		Coordinate placement = null;
+		Coordinate placement = coordinate;
 
 //		Debug.Log ("Perm size: " + permutation.Length);
 
+
 		foreach (Tile tile in permutation) {
 //			Debug.Log ("Tile in permutation: " + tile);
-			placement = place(board, context, tile, coordinate, direction);
+			placement = place(board, context, tile, placement, direction);
 			if (placement != null) {
-				placements.Add(placement);
+				placements.Add (placement);
+			} else {
+				break;
 			}
 		}
 		if (placements.Count == permutation.Length) { 
 			PredictedBoard prediction = new PredictedBoard(board, new PredictedContext(context));
-			int score = scoring.score(prediction, placements, direction);
+			int score = scoring.score(prediction, placements.ToArray(), direction);
 
 //			Debug.Log ("board: \n" + prediction);
 //			Debug.Log ("score: " + score);
-			return new PredictionResult(new List<Tile>(permutation), placements, score);
+			return new PredictionResult(permutation, placements.ToArray(), score);
 		}
 		else {
 			//			Debug.Log("the sizes did not match..." + placements.Count + " " + permutation.Length);
-			return new PredictionResult(new List<Tile>(), new List<Coordinate>(), -1);
+			return new PredictionResult(new Tile[0], new Coordinate[0], -1);
 		}
 	}
 	private Coordinate place(ScrabbleBoard fixedBoard, Tile[,] context, Tile tile, Coordinate origin, ScrabbleScoringDirection direction) {

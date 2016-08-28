@@ -25,20 +25,21 @@ public interface ScrabbleGame {
 
 public interface GameDelegate {
 
-	void playerDrawTiles(Player player);
+	void playerDrewTiles(Player player, Tile[] tiles);
 	void playersTurn(Player player);
 	void predictionsDetermined(Player player, Coordinate coordinate, List<PredictionResult> predictions);
 	void solutionDetermined(Player player, List<PredictionResult> predictions);
 	void playerScored(Player player, int score);
 	void playerWon(Player player);
 	void scoreboardUpdated(Scoreboard scoreboard);
-	void boardUpdated(ScrabbleBoard board);
 }
 
 public class ScrabbleGameConfiguration {
 	public int predictions;
-	public ScrabbleGameConfiguration(int predictions) {
+	public PlayerConfiguration playerconfig;
+	public ScrabbleGameConfiguration(int predictions, PlayerConfiguration playerconfig) {
 		this.predictions = predictions;
+		this.playerconfig = playerconfig;
 	}
 }
 
@@ -70,22 +71,8 @@ public sealed class Game: ScrabbleGame {
 		this.scoring = new ScrabblePlayerMoveScoring(wordScoring, dict);
 
 		this.board = board;
-		// previously placed tiles
-		board.setTile(new Tile(TileType.LETTER, 'H'), 3, 0);
-		board.setTile(new Tile(TileType.LETTER, 'E'), 3, 1);
-		board.setTile(new Tile(TileType.LETTER, 'L'), 3, 2);
-		board.setTile(new Tile(TileType.LETTER, 'L'), 3, 3);
-		board.setTile(new Tile(TileType.LETTER, 'O'), 3, 4);
 
-		this.board = board;
-		Debug.Log (board);
-		// _ | _ | _ | H | _ |
-		// _ | _ | _ | E | _ |
-		// _ | _ | _ | L | _ |
-		// _ | _ | _ | L | _ |
-		// _ | _ | _ | O | _ |
-
-		PlayerConfiguration playerconfig = new PlayerConfiguration(4);
+		PlayerConfiguration playerconfig = config.playerconfig;
 		Bag bag = new Bag(BagConfiguration.STANDARD_NO_WILDCARDS);
 		PlayerMoveBroker broker = new PlayerMoveBroker(scoring, board, playerconfig, bag);
 		this.broker = broker;
@@ -103,7 +90,7 @@ public sealed class Game: ScrabbleGame {
 		// give players 7 tiles
 		foreach (Player player in players) {
 			broker.replenish(player);
-			del.playerDrawTiles(player);
+			del.playerDrewTiles(player, player.tiles.ToArray());
 		}
 		updateTurn();
 	}
@@ -126,24 +113,43 @@ public sealed class Game: ScrabbleGame {
 	public int play(Player player, AbstractPlayerMove move) {
 		if (turn == -1) return -1; // game didn't start
 
+		HashSet<Tile> originalTiles = new HashSet<Tile> (player.tiles);
+		Debug.Log ("original: ");
+		foreach (Tile t in originalTiles) {
+			Debug.Log (t);
+		}
 		int score = broker.brokerMove(player, move);
 		if (score == -1) {
 			return -1; // illegal move
 		}
 
+		HashSet<Tile> current = new HashSet<Tile> (player.tiles);
+		Debug.Log ("current state: ");
+		foreach (Tile t in current) {
+			Debug.Log (t);
+		}
+		current.ExceptWith (originalTiles);
+		Debug.Log ("diff: ");
+		foreach (Tile t in current) {
+			Debug.Log (t);
+		}
+
+		List<Tile> drawn = new List<Tile> (current);
 		scoreboard.score(player, score);
-		del.boardUpdated(board);
 		del.playerScored(player, score);
 		del.scoreboardUpdated(scoreboard);
-		del.playerDrawTiles(player);
+		del.playerDrewTiles(player, drawn.ToArray());
 
-		if (gameOver()) {
-			del.playerWon(player);
-		}
-		else {
-			updateTurn();
-		}
 
+
+		// TODO: check gameover
+//		if (gameOver()) {
+//			del.playerWon(player);
+//		}
+//		else {
+//			updateTurn();
+//		}
+		updateTurn();
 		return score;
 	}
 

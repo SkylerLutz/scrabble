@@ -62,8 +62,8 @@ public sealed class PredictionTests {
 //		Debug.Log("Test results: " + ((endTime - startTime) / 1000000) + "ms.");
 		foreach (PredictionResult result in list) {
 			Debug.Log(result.score);
-			Debug.Log(result.tiles.ToArray());
-			Debug.Log(result.coordinates.ToArray());
+			Debug.Log(result.tiles);
+			Debug.Log(result.coordinates);
 		}
 	}
 	
@@ -127,7 +127,7 @@ public sealed class PredictionTests {
 //		Debug.Log("Test results: " + ((endTime - startTime) / 1000000) + "ms.");
 
 		foreach (PredictionResult result in list) {
-			Debug.Log (PredictionTests.stringify(result.tiles.ToArray()) + " at " + PredictionTests.stringify(result.coordinates.ToArray()) + " for " + result.score );
+			Debug.Log (PredictionTests.stringify(result.tiles) + " at " + PredictionTests.stringify(result.coordinates) + " for " + result.score );
 		}
 	}
 	private static String stringify<T>(T[] array) {
@@ -179,8 +179,8 @@ public sealed class PredictionTests {
 		}
 		foreach (PredictionResult result in resultSet) {
 			Debug.Log(result.score);
-			Debug.Log(result.tiles.ToArray());
-			Debug.Log(result.coordinates.ToArray());
+			Debug.Log(result.tiles);
+			Debug.Log(result.coordinates);
 			Debug.Log("");
 		}
 	}

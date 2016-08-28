@@ -12,13 +12,13 @@ public sealed class ScrabblePlayerMoveScoring {
 		this.dict = dict;
 	}	
 
-	public int score(ScrabbleBoard board, List<Coordinate> placedTileCoordinates, ScrabbleScoringDirection direction) {
+	public int score(ScrabbleBoard board, Coordinate[] placedTileCoordinates, ScrabbleScoringDirection direction) {
 		
 //		Debug.Log("Player placed: " + placedTileCoordinates.ToArray().ToString() + " (" + direction + ").");
 //		foreach (Coordinate c in placedTileCoordinates) {
 //			Debug.Log (c);
 //		}
-		if (placedTileCoordinates.Count == 0) {
+		if (placedTileCoordinates.Length == 0) {
 //			Debug.Log ("nothing was placed");
 			return -1; // nothing was placed
 		}

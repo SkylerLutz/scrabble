@@ -13,7 +13,7 @@ public class ScrabbleScoringDirectionHelper {
 		case ScrabbleScoringDirection.VERTICAL: return 0;
 		}
 		//		System.exit(1);
-		Environment.Exit(1);
+
 		return 0;
 	}
 	public static int verticalDelta(ScrabbleScoringDirection direction) {
@@ -22,7 +22,7 @@ public class ScrabbleScoringDirectionHelper {
 		case ScrabbleScoringDirection.VERTICAL: return 1;
 		}
 		//		System.exit(1);
-		Environment.Exit(1);
+
 		return 0;
 	}
 	public static ScrabbleScoringDirection orthogonal(ScrabbleScoringDirection direction) {
@@ -31,7 +31,7 @@ public class ScrabbleScoringDirectionHelper {
 		case ScrabbleScoringDirection.VERTICAL: return ScrabbleScoringDirection.HORIZONTAL;
 		}
 		//		System.exit(1);
-		Environment.Exit(1);
+
 		return ScrabbleScoringDirection.HORIZONTAL;
 
 	}

@@ -53,21 +53,26 @@ public sealed class Raycasting {
 		fixedSet.IntersectWith(other);
 		return fixedSet.Count != 0;
 	} 
-	public static ScrabbleScoringDirection getDirection(List<Coordinate> coordinates) {
-		HashSet<int> h = new HashSet<int>();
-		HashSet<int> v = new HashSet<int>();
-		foreach (Coordinate coordinate in coordinates) {
-			h.Add(coordinate.x);
-			v.Add(coordinate.y);
+	public static ScrabbleScoringDirection getDirection(Coordinate[] coordinates) {
+
+		if (coordinates.Length < 1) {
+			return ScrabbleScoringDirection.HORIZONTAL;
 		}
-		if (h.Count == 1) {
+		Coordinate first = coordinates [0];
+
+
+		if (coordinates.Length < 2) {
+			return ScrabbleScoringDirection.HORIZONTAL;
+		}
+		Coordinate other = coordinates [1];
+
+
+		if (first.x == other.x) {
 			return ScrabbleScoringDirection.VERTICAL;
-		}
-		else if (v.Count == 1) {
+		} else if (first.y == other.y) {
 			return ScrabbleScoringDirection.HORIZONTAL;
 		}
 		else {
-			Environment.Exit(1);
 			return ScrabbleScoringDirection.HORIZONTAL;
 		}
 	}

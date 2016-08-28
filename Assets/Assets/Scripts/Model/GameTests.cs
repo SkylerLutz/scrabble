@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+
 public sealed class GameTests: GameDelegate {
 
 	public GameTests() {
@@ -15,13 +16,19 @@ public sealed class GameTests: GameDelegate {
 	private Player[] players;
 	public void gameTest() {
 
-		ScrabbleBoard board = new ScrabbleBoard(ScrabbleBoardConfiguration.LARGE);
-		
-		this.game = new Game(new ScrabbleGameConfiguration(3), board, players, this);
+		// config
+		int numTiles = 7;
+		int numResults = 3;
+		ScrabbleBoardConfiguration size = ScrabbleBoardConfiguration.LARGE;
+
+
+		ScrabbleBoard board = new ScrabbleBoard(size);
+
+		this.game = new Game(new ScrabbleGameConfiguration(numResults, new PlayerConfiguration(numTiles)), board, players, this);
 		this.game.start();
 	}
 
-	public void playerDrawTiles(Player player) {
+	public void playerDrewTiles(Player player, Tile[] drawnTiles) {
 		//Debug.Log("Player " + player + "'s rack contains: " + Arrays.toString(player.tiles.toArray()));
 	}
 	private static String stringify<T>(T[] array) {
@@ -31,9 +38,16 @@ public sealed class GameTests: GameDelegate {
 		}
 		return s;
 	}
+	private bool played = false;
+	private DateTime start;
+
 	public void playersTurn(Player player) {
+		if (played == true)
+			return;
 		Debug.Log ("Players turn: " + player);
 		Debug.Log ("Players rack: " + GameTests.stringify(player.tiles.ToArray()));
+
+		start = DateTime.Now;
 		game.solve(player);
 	}
 	public void predictionsDetermined(Player player, Coordinate coordinate, List<PredictionResult> predictions) {
@@ -44,6 +58,10 @@ public sealed class GameTests: GameDelegate {
 		this.predictions = predictions;
 		if (predictions.Count > 0) {
 			AbstractPlayerMove best = predictions[0];
+			played = true;
+			DateTime end = DateTime.Now;
+			double ms = (end - start).TotalMilliseconds;
+			Debug.Log ("Solution took " + ms + " ms.");
 			game.play(player, best);
 		}
 		else {
@@ -61,12 +79,12 @@ public sealed class GameTests: GameDelegate {
 		// stub
 		Debug.Log(scoreboard);
 	}
-	public void boardUpdated(ScrabbleBoard board) {
-		Debug.Log("Board");
-		Debug.Log(board);
-		
-		for (int i = 0; i < players.Length; i++) {
-			Debug.Log("Player " + (i+1) + "'s rack contains: " + GameTests.stringify(players[i].tiles.ToArray()));
-		}
-	}
+//	public void boardUpdated(ScrabbleBoard board) {
+//		Debug.Log("Board");
+//		Debug.Log(board);
+//		
+//		for (int i = 0; i < players.Length; i++) {
+//			Debug.Log("Player " + (i+1) + "'s rack contains: " + GameTests.stringify(players[i].tiles.ToArray()));
+//		}
+//	}
 }
