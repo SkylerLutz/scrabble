@@ -15,7 +15,7 @@ public sealed class GameTests: GameDelegate {
 	private Player[] players;
 	public void gameTest() {
 
-		ScrabbleBoard board = new ScrabbleBoard(ScrabbleBoardConfiguration.STANDARD);
+		ScrabbleBoard board = new ScrabbleBoard(ScrabbleBoardConfiguration.LARGE);
 		
 		this.game = new Game(new ScrabbleGameConfiguration(3), board, players, this);
 		this.game.start();

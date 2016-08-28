@@ -6,7 +6,7 @@ public interface RackControllerDelegate {
 	void placeTileOnBoard (TilePrefab tile);
 }
 
-public class RackController : MonoBehaviour, TilePrefabDelegate {
+public class RackController : MonoBehaviour {
 
 	public RackControllerDelegate Del;
 
@@ -23,10 +23,10 @@ public class RackController : MonoBehaviour, TilePrefabDelegate {
 		
 		initTiles ();
 
-		for (int i = 0; i < config.maxTiles; i++) {
-			Tile t = new Tile ();
-			addTile (t);
-		}
+//		for (int i = 0; i < config.maxTiles; i++) {
+//			Tile t = new Tile ();
+//			addTile (t);
+//		}
 	}
 
 	private void initTiles() {

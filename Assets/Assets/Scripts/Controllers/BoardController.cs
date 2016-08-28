@@ -5,7 +5,7 @@ public interface BoardControllerDelegate {
 	void removeTileFromBoard (TilePrefab tile);
 }
 
-public class BoardController : MonoBehaviour, TilePrefabDelegate {
+public class BoardController : MonoBehaviour {
 
 	public BoardControllerDelegate Del;
 

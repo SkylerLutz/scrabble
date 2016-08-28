@@ -156,96 +156,98 @@ public class ScrabbleBoard {
 
 	}
 	private void setupLargeBoard() {
-		//		this.spaces[0] = new TileSpace[]{	   new TileSpace(TileSpaceType.TRIPLE_WORD_SCORE),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.TRIPLE_WORD_SCORE)};
-		//
-		//		this.spaces[1] = new TileSpace[]{	   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL)};
-		//
-		//		this.spaces[2] = new TileSpace[]{new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL)};
-		//
-		//		this.spaces[3] = new TileSpace[]{new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL)};
-		//
-		//		this.spaces[4] = new TileSpace[]{new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.CENTER), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL)};
-		//
-		//
-		//		this.spaces[5] = new TileSpace[]{new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL)};
-		//
-		//		this.spaces[6] = new TileSpace[]{new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL)};
-		//
-		//		this.spaces[7] = new TileSpace[]{	   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL), 
-		//							   new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE), 
-		//							   new TileSpace(TileSpaceType.NORMAL)};
-		//
-		//		this.spaces[8] = new TileSpace[]{	   new TileSpace(TileSpaceType.TRIPLE_WORD_SCORE),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.NORMAL),
-		//							   new TileSpace(TileSpaceType.TRIPLE_WORD_SCORE)};
+		this.spaces [0, 0] = new TileSpace (TileSpaceType.TRIPLE_WORD_SCORE);
+		this.spaces [0, 1] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [0, 2] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [0, 3] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [0, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [0, 5] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [0, 6] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [0, 7] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [0, 8] = new TileSpace(TileSpaceType.TRIPLE_WORD_SCORE);
+
+		this.spaces [1, 0] = new TileSpace (TileSpaceType.NORMAL);
+		this.spaces [1, 1] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [1, 2] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [1, 3] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [1, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [1, 5] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [1, 6] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [1, 7] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [1, 8] = new TileSpace(TileSpaceType.NORMAL);
+
+		this.spaces [2, 0] = new TileSpace (TileSpaceType.NORMAL);
+		this.spaces [2, 1] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [2, 2] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [2, 3] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [2, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [2, 5] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [2, 6] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [2, 7] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [2, 8] = new TileSpace(TileSpaceType.NORMAL);
+
+		this.spaces [3, 0] = new TileSpace (TileSpaceType.NORMAL);
+		this.spaces [3, 1] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [3, 2] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [3, 3] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [3, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [3, 5] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [3, 6] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [3, 7] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [3, 8] = new TileSpace(TileSpaceType.NORMAL);
+
+		this.spaces [4, 0] = new TileSpace (TileSpaceType.NORMAL);
+		this.spaces [4, 1] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [4, 2] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [4, 3] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [4, 4] = new TileSpace(TileSpaceType.CENTER);
+		this.spaces [4, 5] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [4, 6] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [4, 7] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [4, 8] = new TileSpace(TileSpaceType.NORMAL);
+
+		this.spaces [5, 0] = new TileSpace (TileSpaceType.NORMAL);
+		this.spaces [5, 1] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [5, 2] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [5, 3] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [5, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [5, 5] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [5, 6] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [5, 7] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [5, 8] = new TileSpace(TileSpaceType.NORMAL);
+
+		this.spaces [6, 0] = new TileSpace (TileSpaceType.NORMAL);
+		this.spaces [6, 1] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [6, 2] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [6, 3] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [6, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [6, 5] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [6, 6] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [6, 7] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [6, 8] = new TileSpace(TileSpaceType.NORMAL);
+
+
+	
+
+		this.spaces [7, 0] = new TileSpace (TileSpaceType.NORMAL);
+		this.spaces [7, 1] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [7, 2] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [7, 3] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [7, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [7, 5] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [7, 6] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [7, 7] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
+		this.spaces [7, 8] = new TileSpace(TileSpaceType.NORMAL);
+
+		this.spaces [8, 0] = new TileSpace (TileSpaceType.TRIPLE_WORD_SCORE);
+		this.spaces [8, 1] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [8, 2] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [8, 3] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [8, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [8, 5] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [8, 6] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [8, 7] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [8, 8] = new TileSpace(TileSpaceType.TRIPLE_WORD_SCORE);
 
 	}
 	public TileSpace getSpace(int i, int j) {
