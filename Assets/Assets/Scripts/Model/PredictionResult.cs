@@ -14,6 +14,6 @@ public sealed class PredictionResult: AbstractPlayerMove, IComparable<Prediction
 		return -this.score.CompareTo(other.score);
 	}
 	public override String ToString() {
-		return rootWord;
+		return rootWord + " (" + score + " points)";
 	}
 }

@@ -298,8 +298,9 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 						foreach (GameObject ghost in solution) {
 							Destroy (ghost);
 						}
-						displayPrediction(result);
-						// placePrediction(result);
+						//displayPrediction(result);
+						placePrediction(result);
+						commitMove ();
 					}
 				}
 			}
@@ -388,7 +389,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 		Player p1 = new Player();
 		Player p2 = new Player();
-		Player[] ps = { p1, p2 };
+		Player[] ps = { p1 };
 		this.players = ps;
 
 		ScrabbleBoard board = new ScrabbleBoard(size);
@@ -440,7 +441,11 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		this.active = player;
 
 		syncViewBoardToModelBoard ();
-//		game.solve(player);
+
+		playerMoveContextTiles = new List<Tile> ();
+		playerMoveContextCoordinates = new List<Coordinate> ();
+
+		game.solve(player);
 	}
 	public void predictionsDetermined(Player player, Coordinate coordinate, List<PredictionResult> predictions) {
 
@@ -453,6 +458,8 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 		if (predictions.Count > 0) {
 			prediction1.GetComponent<TextMesh> ().text = predictions [0].ToString ();
+			placePrediction(predictions[0]);
+			commitMove ();
 		}
 		if (predictions.Count > 1) {
 			prediction2.GetComponent<TextMesh> ().text = predictions [1].ToString ();
