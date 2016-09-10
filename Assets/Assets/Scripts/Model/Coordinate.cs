@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System;
 
-public class Coordinate: IComparable<Coordinate> {
+public class Coordinate: IComparable<Coordinate>, IEquatable<Coordinate> {
 	public int x;
 	public int y;
 	public Coordinate(int x, int y) {
@@ -13,5 +13,8 @@ public class Coordinate: IComparable<Coordinate> {
 	}
 	public int CompareTo(Coordinate other) {
 		return (this.x == other.x && this.y == other.y) ? 0 : 1;
+	}
+	public bool Equals(Coordinate other) {
+		return this.x == other.x && this.y == other.y;
 	}
 }

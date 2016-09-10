@@ -163,7 +163,6 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		// remove tile from rack
 		for (int n = 0; n < rackRepresentation.Length; n++) {
 			if (go == rackRepresentation[n]) {
-				Debug.Log("removed g.o. from rack");
 				rackRepresentation[n] = null;
 			}
 		}
