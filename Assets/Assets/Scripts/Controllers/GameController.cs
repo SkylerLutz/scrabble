@@ -3,11 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-public class GameController : MonoBehaviour, TileDelegate {
+public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
-	public Transform view;
-
+	// Model Objects
 	public Game game;
+	public Player[] players;
+	public Player active;
+
+	// View Object
+	public Transform view;
 
 	// GameObjects
 	public GameObject rack;
@@ -47,12 +51,13 @@ public class GameController : MonoBehaviour, TileDelegate {
 	// Lifecycle methods
 	void Start() {
 
-		GameTests tests = new GameTests();
-		tests.gameTest();
-
+//		GameTests tests = new GameTests();
+//		tests.gameTest();
 //		PredictionTests.standardTest ();
 
 		init();
+
+		setupInitialState();
 	}
 	void init() {
 		// TODO: setup initial state
@@ -154,17 +159,69 @@ public class GameController : MonoBehaviour, TileDelegate {
 		return true;
 	}
 	public void placeTileAt (GameObject go, int i, int j) {
+
+		// remove tile from rack
+		for (int n = 0; n < rackRepresentation.Length; n++) {
+			if (go == rackRepresentation[n]) {
+				Debug.Log("removed g.o. from rack");
+				rackRepresentation[n] = null;
+			}
+		}
+
+		bool wasMove = false;
+		int prev_x = -1;
+		int prev_y = -1;
+		// add to & adjust the move context
+		for (int x = 0; x < moveContext.GetLength(0); x++) {
+
+			for (int y = 0; y < moveContext.GetLength(0); y++) {
+				if (moveContext [x, y] == go) {
+					moveContext [x, y] = null;
+					wasMove = true;
+					prev_x = x;
+					prev_y = y;
+					goto Outer; // break nested loop
+				}
+			}
+		}
+		Outer:
+		moveContext [i, j] = go;
+
+
+
 		Text letterLabel = go.transform.FindChild("TextCanvas").gameObject.transform.FindChild("Letter").gameObject.GetComponent<Text>();
 
-		playerMoveContextTiles.Add(new Tile(TileType.LETTER, letterLabel.text.ToCharArray()[0]));
-		playerMoveContextCoordinates.Add (new Coordinate (i, j));
+		Coordinate c = new Coordinate (i, j);
+		char letter = letterLabel.text.ToCharArray () [0];
+		Debug.Log ("Dropping tile " + letter + " at: " + c);
+
+		if (wasMove && prev_x != -1 && prev_y != -1) {
+			for (int k = 0; k < playerMoveContextCoordinates.Count; k++) {
+				Coordinate temp = playerMoveContextCoordinates [k];
+				if (temp.x == prev_x && temp.y == prev_y) {
+					playerMoveContextCoordinates.RemoveAt (k);
+					playerMoveContextTiles.RemoveAt(k);
+				}
+			}
+		}
+
+		playerMoveContextTiles.Add(new Tile(TileType.LETTER, letter));
+		playerMoveContextCoordinates.Add (c);
 	}
 
 	private void commitMove() {
-		PlayerMove move = new PlayerMove (playerMoveContextTiles, playerMoveContextCoordinates);
+		PlayerMove move = new PlayerMove (playerMoveContextTiles.ToArray(), playerMoveContextCoordinates.ToArray());
 
-		Player mock = new Player ();
-		game.play (mock, move);
+		Debug.Log ("committing the move: " + move);
+
+		int result = game.play (active, move);
+		if (result == -1) {
+			// TODO: handle error
+			Debug.Log("invalid move");
+		} else {
+			playerMoveContextTiles = new List<Tile> ();
+			playerMoveContextCoordinates = new List<Coordinate> ();
+		}
 
 		// TODO: Clear player move context stuff once the valid callback comes back from the game model.
 	}
@@ -189,13 +246,13 @@ public class GameController : MonoBehaviour, TileDelegate {
 
 				// Calculate x position of new tile on the rack
 				float width = board.transform.FindChild ("BoardBox").gameObject.GetComponent<Collider> ().bounds.size.x;
-				Vector3 boardOrigin = new Vector3 (board.transform.position.x - width / 2.0f, 0, board.transform.position.z - width / 2.0f);
+				Vector3 boardOrigin = new Vector3 (board.transform.position.x + width / 2.0f, 0, board.transform.position.z - width / 2.0f);
 
 				float spaceWidth = width / dimension;
 				GameObject surface = board.transform.FindChild ("Surface").gameObject;
 
-				Vector3 centerOffset = new Vector3 ((spaceWidth / 2.0f), 0, (spaceWidth / 2.0f));
-				Vector3 oneOver = new Vector3 (coordinate.x * spaceWidth,0,coordinate.y * spaceWidth);
+				Vector3 centerOffset = new Vector3 (-(spaceWidth / 2.0f), 0, (spaceWidth / 2.0f));
+				Vector3 oneOver = new Vector3 (-coordinate.x * spaceWidth,0,coordinate.y * spaceWidth);
 				TilePrefab p = go.GetComponent<TilePrefab>();
 				p.isFixed = true;
 				p.del = this;
@@ -209,43 +266,104 @@ public class GameController : MonoBehaviour, TileDelegate {
 	}
 	void LateUpdate() {
 
-		if (Input.GetMouseButtonDown (0)) {
-
-			Tile t = new Tile (TileType.LETTER, 'A');
-			addTile (t);
-		}
+//		if (Input.GetMouseButtonDown (0)) {
+//
+//			Tile t = new Tile (TileType.LETTER, 'A');
+//			addTile (t);
+//		}
 		if (Input.GetMouseButtonDown (1)) {
 
 			// TODO: save button
 //			commitMove();
-			setupInitialState();
+			Debug.Log("Solving...");
+			game.solve(active);
 		}
 	}
 
 	private void setupInitialState() {
-		Tile t1 = new Tile (TileType.LETTER, 'H');
-		Tile t2 = new Tile (TileType.LETTER, 'E');
-		Tile t3 = new Tile (TileType.LETTER, 'L');
-		Tile t4 = new Tile (TileType.LETTER, 'L');
-		Tile t5 = new Tile (TileType.LETTER, 'O');
 
-		Coordinate c1 = new Coordinate (2, 4);
-		Coordinate c2 = new Coordinate (3, 4);
-		Coordinate c3 = new Coordinate (4, 4);
-		Coordinate c4 = new Coordinate (5, 4);
-		Coordinate c5 = new Coordinate (6, 4);
+		int numTiles = rackConfig.maxTiles;
+		int numResults = 3;
+		ScrabbleBoardConfiguration size = ScrabbleBoardConfiguration.STANDARD;
 
-		fixedTiles.Add (t1);
-		fixedTiles.Add (t2);
-		fixedTiles.Add (t3);
-		fixedTiles.Add (t4);
-		fixedTiles.Add (t5);
+		Player p1 = new Player();
+		Player p2 = new Player();
+		Player[] ps = { p1, p2 };
+		this.players = ps;
 
-		fixedPositions.Add (c1);
-		fixedPositions.Add (c2);
-		fixedPositions.Add (c3);
-		fixedPositions.Add (c4);
-		fixedPositions.Add (c5);
+		ScrabbleBoard board = new ScrabbleBoard(size);
+		// previously placed tiles
+		board.setTile(new Tile(TileType.LETTER, 'H'), 3, 2);
+		board.setTile(new Tile(TileType.LETTER, 'E'), 3, 3);
+		board.setTile(new Tile(TileType.LETTER, 'L'), 3, 4);
+		board.setTile(new Tile(TileType.LETTER, 'L'), 3, 5);
+		board.setTile(new Tile(TileType.LETTER, 'O'), 3, 6);
 
+		this.game = new Game(new ScrabbleGameConfiguration(numResults, new PlayerConfiguration(numTiles)), board, players, this);
+		this.game.start();
+
+	}
+
+	private void syncViewBoardToModelBoard() {
+
+
+		// diff the model board with the view board and insert game objects for each change.
+		for (int i = 0; i < boardConfig.dimension; i++) {
+			for (int j = 0; j < boardConfig.dimension; j++) {
+
+				GameObject go = moveContext [i, j];
+				if (go != null) {
+					Debug.Log ("found game object at (" + i + ", " + j + ")");
+					moveContext [i, j] = null;
+					boardRepresentation [i, j] = go;
+				}
+
+
+				Coordinate coordinate = new Coordinate(i, j);
+				Tile tile = game.board.getTile (i, j);
+				if (tile != null && !fixedPositions.Contains (coordinate)) {
+					fixedPositions.Add (coordinate);
+					fixedTiles.Add (tile);
+				}
+			}
+		}
+	}
+	// Game Callbacks
+	public void playerDrewTiles(Player player, Tile[] drawnTiles) {
+		foreach(Tile tile in drawnTiles) {
+			addTile (tile);
+		}
+	}
+		
+	public void playersTurn(Player player) {
+		Debug.Log("It's player: " + player + "'s turn.");
+		this.active = player;
+
+		syncViewBoardToModelBoard ();
+//		game.solve(player);
+	}
+	public void predictionsDetermined(Player player, Coordinate coordinate, List<PredictionResult> predictions) {
+
+	}
+	public void solutionDetermined(Player player, List<PredictionResult> predictions) {
+		Debug.Log("Board solved. " + predictions.Count + " possible moves were found.");
+//		if (predictions.Count > 0) {
+//			AbstractPlayerMove best = predictions[0];
+//			game.play(player, best);
+//		}
+//		else {
+//			Debug.Log("Player: " + player + " has no options to move.");
+//		}
+	}
+	public void playerScored(Player player, int score) { 
+		Debug.Log ("Player " + player + " scored " + score + " points.");
+		Debug.Log (game.board);
+	}
+	public void playerWon(Player player) {
+		//		System.exit(0);
+	}
+	public void scoreboardUpdated(Scoreboard scoreboard) {
+		// stub
+//		Debug.Log(scoreboard);
 	}
 }

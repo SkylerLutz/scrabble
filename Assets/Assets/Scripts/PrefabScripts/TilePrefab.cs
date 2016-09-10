@@ -77,9 +77,9 @@ public class TilePrefab : MonoBehaviour {
 
 			// Calculate x position of new tile on the rack
 			float width = board.transform.FindChild ("BoardBox").gameObject.GetComponent<Collider> ().bounds.size.x;
-			Vector3 boardOrigin = new Vector3 (board.transform.position.x - width / 2.0f, 0, board.transform.position.z - width / 2.0f);
+			Vector3 boardOrigin = new Vector3 (board.transform.position.x + width / 2.0f, 0, board.transform.position.z - width / 2.0f);
 
-			float i = Mathf.Floor (Mathf.Lerp (0.0f, (float)dimension, (transform.position.x - boardOrigin.x) / width));
+			float i = Mathf.Floor (Mathf.Lerp (0.0f, (float)dimension, -(transform.position.x - boardOrigin.x) / width));
 			float j = Mathf.Floor (Mathf.Lerp (0.0f, (float)dimension, (transform.position.z - boardOrigin.z) / width));
 
 			if ((int)i >= dimension) {
@@ -98,7 +98,7 @@ public class TilePrefab : MonoBehaviour {
 				del.placeTileAt(gameObject, (int)i, (int)j);
 
 				float spaceWidth = width / dimension;
-				destinationPosition = new Vector3 (i * spaceWidth + boardOrigin.x + (spaceWidth / 2), surface.transform.position.y, j * spaceWidth + boardOrigin.z + (spaceWidth / 2));
+				destinationPosition = new Vector3 (-i * spaceWidth + boardOrigin.x - (spaceWidth / 2), surface.transform.position.y, j * spaceWidth + boardOrigin.z + (spaceWidth / 2));
 				destinationRotation = Quaternion.Euler (Vector3.up);
 			}
 		}

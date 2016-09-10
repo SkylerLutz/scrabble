@@ -3,73 +3,121 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public interface PredictionDelegate {
+	MonoBehaviour mb ();
+	void predictionsDetermined(List<PredictionResult> predictions);
+}
+
 public sealed class Prediction {
 
 	private ScrabblePlayerMoveScoring scoring;
-	public Prediction(ScrabblePlayerMoveScoring scoring) {
+	private PredictionDelegate predictionDelegate;
+
+	public Prediction(ScrabblePlayerMoveScoring scoring, PredictionDelegate predictionDelegate) {
 		this.scoring = scoring;
+		this.predictionDelegate = predictionDelegate;
 	}
 
-	public List<PredictionResult> predict(ScrabbleBoard board, List<Tile> tiles, Coordinate coordinate) {
+	public void predict(ScrabbleBoard board, List<Tile> tiles, Coordinate coordinate) {
+		predictionDelegate.mb ().StartCoroutine (predictCoroutine (board, tiles, coordinate));
+	}
 
-		//System.out.println("Predicting " + Arrays.toString(tiles.toArray()) + " to be placed on board \n" + board + "\n at coordinate: " + coordinate);
-
-		// predicted moves much touch at least one fixed tile. (TODO: except for the first move)
+	private IEnumerator predictCoroutine(ScrabbleBoard board, List<Tile> tiles, Coordinate coordinate) {
 		List<Coordinate> horizontalHits = Raycasting.horizontalHitTest(board, coordinate);
 		List<Coordinate> verticalHits = Raycasting.verticalHitTest(board, coordinate);
-
-//		Debug.Log ("h_hits: " + horizontalHits.Count);
-//		Debug.Log ("v_hits: " + verticalHits.Count);
-
 		List<PredictionResult> predictions = new List<PredictionResult>();
 
 		List<List<Tile>> pset = PowerSet.powerset(tiles);
 		foreach (List<Tile> s in pset) {
+
 			Permutator<Tile> permutator = new Permutator<Tile>(s.ToArray());
 			Tile[] permutation = null;
 			while (true) {
 				permutation = permutator.next();
 				if (permutation == null) break;
 				if (permutation.Length == 0) continue;
-
-				/*
-				Debug.Log("Analyzing permutation: ");
-				foreach (Tile t in permutation) {
-					Debug.Log(t + "|");
-				}
-				Debug.Log("");
-				*/
-
-//				Debug.Log ("Checking horizontal");
 				if (Raycasting.horizontalContains (horizontalHits, coordinate, permutation.Length + horizontalHits.Count)) {
 					PredictionResult horizontalPrediction = predict (board, permutation, coordinate, ScrabbleScoringDirection.HORIZONTAL); 
 					if (horizontalPrediction.score != -1) {
 						predictions.Add (horizontalPrediction);
 					}
-				} /*else {
-					Debug.Log ("nada");
-				}*/
-
-//				Debug.Log ("Checking vertical for coordinate: " + coordinate);
-//				Debug.Log ("hits: " + verticalHits);
-//				foreach (Coordinate c in verticalHits) {
-//					Debug.Log (c + " ... ");
-//				}
-//				Debug.Log ("");
-//				Debug.Log ("radius: " + (permutation.Length + verticalHits.Count));
-//				Debug.Log ("Checking vertical");
+				}
 				if (Raycasting.verticalContains (verticalHits, coordinate, permutation.Length + verticalHits.Count)) {
 					PredictionResult verticalPrediction = predict (board, permutation, coordinate, ScrabbleScoringDirection.VERTICAL); 
 					if (verticalPrediction.score != -1) { 
 						predictions.Add (verticalPrediction);
 					}
-				} /* else {
-					Debug.Log ("nada");
-				}*/
+				}
 			}
+
+			yield return new WaitForEndOfFrame();
+
+
 		}
-		return predictions;
+		predictionDelegate.predictionsDetermined (predictions);
 	}
+
+	// synchronous way
+//	public List<PredictionResult> predict(ScrabbleBoard board, List<Tile> tiles, Coordinate coordinate) {
+//
+//		//System.out.println("Predicting " + Arrays.toString(tiles.toArray()) + " to be placed on board \n" + board + "\n at coordinate: " + coordinate);
+//
+//		// predicted moves much touch at least one fixed tile. (TODO: except for the first move)
+//		List<Coordinate> horizontalHits = Raycasting.horizontalHitTest(board, coordinate);
+//		List<Coordinate> verticalHits = Raycasting.verticalHitTest(board, coordinate);
+//
+////		Debug.Log ("h_hits: " + horizontalHits.Count);
+////		Debug.Log ("v_hits: " + verticalHits.Count);
+//
+//		List<PredictionResult> predictions = new List<PredictionResult>();
+//
+//		List<List<Tile>> pset = PowerSet.powerset(tiles);
+//		foreach (List<Tile> s in pset) {
+//			Permutator<Tile> permutator = new Permutator<Tile>(s.ToArray());
+//			Tile[] permutation = null;
+//			while (true) {
+//				permutation = permutator.next();
+//				if (permutation == null) break;
+//				if (permutation.Length == 0) continue;
+//
+//				/*
+//				Debug.Log("Analyzing permutation: ");
+//				foreach (Tile t in permutation) {
+//					Debug.Log(t + "|");
+//				}
+//				Debug.Log("");
+//				*/
+//
+////				Debug.Log ("Checking horizontal");
+//				if (Raycasting.horizontalContains (horizontalHits, coordinate, permutation.Length + horizontalHits.Count)) {
+//					PredictionResult horizontalPrediction = predict (board, permutation, coordinate, ScrabbleScoringDirection.HORIZONTAL); 
+//					if (horizontalPrediction.score != -1) {
+//						predictions.Add (horizontalPrediction);
+//					}
+//				} /*else {
+//					Debug.Log ("nada");
+//				}*/
+//
+////				Debug.Log ("Checking vertical for coordinate: " + coordinate);
+////				Debug.Log ("hits: " + verticalHits);
+////				foreach (Coordinate c in verticalHits) {
+////					Debug.Log (c + " ... ");
+////				}
+////				Debug.Log ("");
+////				Debug.Log ("radius: " + (permutation.Length + verticalHits.Count));
+////				Debug.Log ("Checking vertical");
+//				if (Raycasting.verticalContains (verticalHits, coordinate, permutation.Length + verticalHits.Count)) {
+//					PredictionResult verticalPrediction = predict (board, permutation, coordinate, ScrabbleScoringDirection.VERTICAL); 
+//					if (verticalPrediction.score != -1) { 
+//						predictions.Add (verticalPrediction);
+//					}
+//				} /* else {
+//					Debug.Log ("nada");
+//				}*/
+//			}
+//		}
+//		return predictions;
+//	}
 
 	private PredictionResult predict(ScrabbleBoard board, Tile[] permutation, Coordinate coordinate, ScrabbleScoringDirection direction) {
 

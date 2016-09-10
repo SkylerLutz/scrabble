@@ -98,16 +98,33 @@ public sealed class Game: ScrabbleGame {
 	public void predict(Player player, Coordinate coordinate) {
 		if (turn == -1) return; // game didn't start
 
-		Prediction prediction = new Prediction(scoring);
-		del.predictionsDetermined(player, coordinate, prediction.predict(board, player.tiles, coordinate));
+//		Prediction prediction = new Prediction(scoring);
+//		del.predictionsDetermined(player, coordinate, prediction.predict(board, player.tiles, coordinate));
+	}
+
+	public class SolverCallback: SolverDelegate {
+		
+		private Player player;
+		private GameDelegate gameDelegate;
+
+		public SolverCallback(Player player, GameDelegate gameDelegate) {
+			this.player = player;
+			this.gameDelegate = gameDelegate;
+		}
+
+		public void solutionDetermined(List<PredictionResult> predictions) {
+			gameDelegate.solutionDetermined (player, predictions);
+		}
+		public MonoBehaviour mb() {
+			return (MonoBehaviour)gameDelegate;
+		}
 	}
 
 	public void solve(Player player) {
 		if (turn == -1) return; // game didn't start
 
-		Solver s = new Solver(new SolverConfiguration(config.predictions), board, scoring);
-		List<PredictionResult> solution = s.solve(player.tiles);
-		del.solutionDetermined(player, solution);
+		Solver s = new Solver(new SolverConfiguration(config.predictions), board, scoring, new SolverCallback(player, del));
+		s.solve(player.tiles); // delegate will be invoked
 	}
 
 	public int play(Player player, AbstractPlayerMove move) {
@@ -154,13 +171,13 @@ public sealed class Game: ScrabbleGame {
 	}
 
 	private bool gameOver() {
-		Solver s = new Solver(new SolverConfiguration(1), board, scoring);
-
-		foreach (Player player in players) {
-			if(s.solve(player.tiles).Count != 0) {
-				return false;
-			}
-		}
-		return true;
+//		Solver s = new Solver(new SolverConfiguration(1), board, scoring);
+//
+//		foreach (Player player in players) {
+//			if(s.solve(player.tiles).Count != 0) {
+//				return false;
+//			}
+//		}
+		return false;
 	}
 }
