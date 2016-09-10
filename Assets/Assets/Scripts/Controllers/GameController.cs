@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 	public Game game;
 	public Player[] players;
 	public Player active;
+	public List<PredictionResult> activePredictions;
 
 	// View Object
 	public Transform view;
@@ -16,6 +17,10 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 	// GameObjects
 	public GameObject rack;
 	public GameObject board;
+
+	public GameObject prediction1;
+	public GameObject prediction2;
+	public GameObject prediction3;
 
 	// Prefabs
 	public GameObject tilePrefab;
@@ -264,12 +269,60 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		}
 	}
 	void LateUpdate() {
+		
+		if (Input.GetMouseButtonDown(0)) {
+			RaycastHit hit;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			if (Physics.Raycast (ray, out hit)) {
+				if (hit.collider != null && hit.transform.tag.Contains ("prediction")) {
+					PredictionResult result = null;
 
-//		if (Input.GetMouseButtonDown (0)) {
-//
-//			Tile t = new Tile (TileType.LETTER, 'A');
-//			addTile (t);
-//		}
+					if (hit.transform.tag.Contains ("1") && activePredictions.Count > 0) {
+						result = activePredictions [0];
+					}
+					else if (hit.transform.tag.Contains ("2") && activePredictions.Count > 1) {
+						result = activePredictions [1];
+					}
+					else if (hit.transform.tag.Contains ("3") && activePredictions.Count > 2) {
+						result = activePredictions [2];
+					}
+
+					if (result != null) { // place the tiles on the board
+						GameObject[] rack = new GameObject[rackRepresentation.Length];
+						bool[] dirty = new bool[rackRepresentation.Length];
+						int index = 0;
+
+						for (int i = 0; i < result.tiles.Length; i++) {
+
+							Tile tile = result.tiles [i];
+
+							for (int j = 0; j < rackRepresentation.Length; j++) {
+								GameObject tileObject = rackRepresentation [j];
+
+								GameObject canvas = tileObject.transform.FindChild ("TextCanvas").gameObject;
+								GameObject letter = canvas.transform.FindChild ("Letter").gameObject;
+								if ((dirty[j] == null || dirty[j] == false) && tile.getLetter ().ToString () == letter.GetComponent<Text> ().text) {
+									rack [index] = tileObject;
+									dirty [j] = true;
+									index += 1;
+									break;
+								}
+							}
+						}
+						for (int i = 0; i < index; i++) {
+							placeTileAt (rack [i], result.coordinates [i].x, result.coordinates [i].y);
+							float width = board.transform.FindChild ("BoardBox").gameObject.GetComponent<Collider> ().bounds.size.x;
+							float spaceWidth = width / boardConfig.dimension;
+							Vector3 boardOrigin = new Vector3 (board.transform.position.x + width / 2.0f, 0, board.transform.position.z - width / 2.0f);
+							GameObject surface = board.transform.FindChild ("Surface").gameObject;
+							rack [i].GetComponent<TilePrefab> ().destinationPosition = new Vector3 (-result.coordinates [i].x * spaceWidth + boardOrigin.x - (spaceWidth / 2), surface.transform.position.y, result.coordinates [i].y * spaceWidth + boardOrigin.z + (spaceWidth / 2));
+							rack [i].GetComponent<TilePrefab> ().destinationRotation = Quaternion.Euler (Vector3.up);
+						}
+					}
+				}
+			}
+
+		}
 		if (Input.GetMouseButtonDown (1)) {
 
 			// TODO: save button
@@ -345,14 +398,22 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 	}
 	public void solutionDetermined(Player player, List<PredictionResult> predictions) {
-		Debug.Log("Board solved. " + predictions.Count + " possible moves were found.");
-//		if (predictions.Count > 0) {
-//			AbstractPlayerMove best = predictions[0];
-//			game.play(player, best);
-//		}
-//		else {
-//			Debug.Log("Player: " + player + " has no options to move.");
-//		}
+		
+		this.activePredictions = predictions;
+
+		Debug.Log ("Board solved. " + predictions.Count + " possible moves were found.");
+
+		if (predictions.Count > 0) {
+			prediction1.GetComponent<TextMesh> ().text = predictions [0].ToString ();
+		}
+		if (predictions.Count > 1) {
+			prediction2.GetComponent<TextMesh> ().text = predictions [1].ToString ();
+		}
+		if (predictions.Count > 2) {
+			prediction3.GetComponent<TextMesh> ().text = predictions [2].ToString ();
+		}
+
+
 	}
 	public void playerScored(Player player, int score) { 
 		Debug.Log ("Player " + player + " scored " + score + " points.");

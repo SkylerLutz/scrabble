@@ -12,7 +12,7 @@ public sealed class ScrabblePlayerMoveScoring {
 		this.dict = dict;
 	}	
 
-	public int score(ScrabbleBoard board, Coordinate[] placedTileCoordinates, ScrabbleScoringDirection direction) {
+	public int score(ScrabbleBoard board, Coordinate[] placedTileCoordinates, ScrabbleScoringDirection direction, out String rootWord) {
 		
 //		Debug.Log("Player placed: " + placedTileCoordinates.ToArray().ToString() + " (" + direction + ").");
 //		foreach (Coordinate c in placedTileCoordinates) {
@@ -20,6 +20,7 @@ public sealed class ScrabblePlayerMoveScoring {
 //		}
 		if (placedTileCoordinates.Length == 0) {
 //			Debug.Log ("nothing was placed");
+			rootWord = null;
 			return -1; // nothing was placed
 		}
 		Coordinate first = placedTileCoordinates[0];
@@ -30,8 +31,10 @@ public sealed class ScrabblePlayerMoveScoring {
 		String word = read(board, root);
 		if (!dict.isWord(word)) {
 //			Debug.Log (word + " is not a word (root)");
+			rootWord = null;
 			return -1;
 		}
+		rootWord = word;
 		ranges.Add(root);
 
 		ScrabbleScoringDirection orthogonal = ScrabbleScoringDirectionHelper.orthogonal(direction);

@@ -140,15 +140,16 @@ public sealed class Prediction {
 		}
 		if (placements.Count == permutation.Length) { 
 			PredictedBoard prediction = new PredictedBoard(board, new PredictedContext(context));
-			int score = scoring.score(prediction, placements.ToArray(), direction);
+			String root = "";
+			int score = scoring.score(prediction, placements.ToArray(), direction, out root);
 
 //			Debug.Log ("board: \n" + prediction);
 //			Debug.Log ("score: " + score);
-			return new PredictionResult(permutation, placements.ToArray(), score);
+			return new PredictionResult(permutation, placements.ToArray(), score, root);
 		}
 		else {
 			//			Debug.Log("the sizes did not match..." + placements.Count + " " + permutation.Length);
-			return new PredictionResult(new Tile[0], new Coordinate[0], -1);
+			return new PredictionResult(new Tile[0], new Coordinate[0], -1, "");
 		}
 	}
 	private Coordinate place(ScrabbleBoard fixedBoard, Tile[,] context, Tile tile, Coordinate origin, ScrabbleScoringDirection direction) {

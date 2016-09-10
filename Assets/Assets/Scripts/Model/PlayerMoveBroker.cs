@@ -37,7 +37,8 @@ public sealed class PlayerMoveBroker {
 		PredictedContext context = new PredictedContext(predictedTiles);
 		PredictedBoard ephemeral = new PredictedBoard(board, context);
 	
-		int score = scoring.score(ephemeral, move.coordinates, direction);
+		String root = null; // unused
+		int score = scoring.score(ephemeral, move.coordinates, direction, out root);
 
 		if (score == -1) {
 			return -1;
