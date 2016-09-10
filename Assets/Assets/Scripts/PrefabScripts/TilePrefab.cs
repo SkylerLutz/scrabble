@@ -20,9 +20,14 @@ public class TilePrefab : MonoBehaviour {
 	public BoardConfiguration boardConfig;
 	public TileDelegate del;
 	public bool isFixed = false;
+//
+//	public void Start() {
+//		this.destinationPosition = transform.position;
+//		this.destinationScale = transform.localScale;
+//		this.destinationRotation = transform.rotation
+//	}
 
-
-	void Update() {
+	public void Update() {
 		if (!isDragging) {
 			gameObject.transform.position = Vector3.MoveTowards (gameObject.transform.position, destinationPosition, 20.0f * Time.deltaTime);  
 			gameObject.transform.rotation = Quaternion.RotateTowards (gameObject.transform.rotation, destinationRotation, 200.0f * Time.deltaTime);

@@ -28,7 +28,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 	// Internal/Intermediate state
 	private GameObject[,] boardRepresentation; // 2d array of tile views
 	private GameObject[,] moveContext; // 2d array of tile views placed during this move
-	private GameObject[,] solution; // 2d array of tile views for a potential move
+	private GameObject[] solution; // array of tile views for a potential move
 	private GameObject[] rackRepresentation; // array of tile views on the player rack
 
 	private List<Tile> fixedTiles;
@@ -44,6 +44,10 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 	public GameObject produceTile(char letter, int pointValue, Vector3 position, Quaternion rotation) {
 
 		GameObject tile = (GameObject)Instantiate(tilePrefab, position, rotation, view);
+//		TilePrefab pf = tile.GetComponent<TilePrefab> ();
+//		pf.destinationPosition = position;
+//		pf.destinationRotation = rotation;
+
 		Text letterLabel = tile.transform.FindChild("TextCanvas").gameObject.transform.FindChild("Letter").gameObject.GetComponent<Text>();
 		Text valueLabel = tile.transform.FindChild("TextCanvas").gameObject.transform.FindChild("Value").gameObject.GetComponent<Text>();
 
@@ -74,13 +78,16 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 		boardRepresentation = new GameObject[boardConfig.dimension,boardConfig.dimension];
 		moveContext = new GameObject[boardConfig.dimension,boardConfig.dimension];
-		solution = new GameObject[boardConfig.dimension,boardConfig.dimension];
+		solution = new GameObject[boardConfig.dimension];
+
+		for (int i = 0; i < boardConfig.dimension; i++) {
+			solution [i] = null;
+		}
 
 		for (int i = 0; i < boardConfig.dimension; i++) {
 			for (int j = 0; j < boardConfig.dimension; j++) {
 				boardRepresentation [i, j] = null;
 				moveContext [i, j] = null;
-				solution [i, j] = null;
 			}
 		}
 
@@ -95,7 +102,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		// TODO: make the tiles come from a sensible vector3 origin
 
 		// TODO: Get tile point value
-		GameObject instance = produceTile(tile.getLetter(), 4, Vector3.up, rack.transform.rotation);
+		GameObject instance = produceTile(tile.getLetter(), this.game.valueOf(tile), Vector3.up, rack.transform.rotation);
 
 		int index = insertTileToRack (instance);
 		if (index == -1) {
@@ -241,7 +248,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 			Tile tile = fixedTiles [i];
 			Coordinate coordinate = fixedPositions [i];
 			if (boardRepresentation [coordinate.x, coordinate.y] == null) {
-				go = produceTile (tile.getLetter (), 4, Vector3.up, Quaternion.Euler (Vector3.up));
+				go = produceTile (tile.getLetter (), this.game.valueOf(tile), Vector3.up, Quaternion.Euler (Vector3.up));
 				boardRepresentation [coordinate.x, coordinate.y] = go;
 
 				// position
@@ -288,36 +295,11 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 					}
 
 					if (result != null) { // place the tiles on the board
-						GameObject[] rack = new GameObject[rackRepresentation.Length];
-						bool[] dirty = new bool[rackRepresentation.Length];
-						int index = 0;
-
-						for (int i = 0; i < result.tiles.Length; i++) {
-
-							Tile tile = result.tiles [i];
-
-							for (int j = 0; j < rackRepresentation.Length; j++) {
-								GameObject tileObject = rackRepresentation [j];
-
-								GameObject canvas = tileObject.transform.FindChild ("TextCanvas").gameObject;
-								GameObject letter = canvas.transform.FindChild ("Letter").gameObject;
-								if ((dirty[j] == null || dirty[j] == false) && tile.getLetter ().ToString () == letter.GetComponent<Text> ().text) {
-									rack [index] = tileObject;
-									dirty [j] = true;
-									index += 1;
-									break;
-								}
-							}
+						foreach (GameObject ghost in solution) {
+							Destroy (ghost);
 						}
-						for (int i = 0; i < index; i++) {
-							placeTileAt (rack [i], result.coordinates [i].x, result.coordinates [i].y);
-							float width = board.transform.FindChild ("BoardBox").gameObject.GetComponent<Collider> ().bounds.size.x;
-							float spaceWidth = width / boardConfig.dimension;
-							Vector3 boardOrigin = new Vector3 (board.transform.position.x + width / 2.0f, 0, board.transform.position.z - width / 2.0f);
-							GameObject surface = board.transform.FindChild ("Surface").gameObject;
-							rack [i].GetComponent<TilePrefab> ().destinationPosition = new Vector3 (-result.coordinates [i].x * spaceWidth + boardOrigin.x - (spaceWidth / 2), surface.transform.position.y, result.coordinates [i].y * spaceWidth + boardOrigin.z + (spaceWidth / 2));
-							rack [i].GetComponent<TilePrefab> ().destinationRotation = Quaternion.Euler (Vector3.up);
-						}
+						displayPrediction(result);
+						// placePrediction(result);
 					}
 				}
 			}
@@ -332,6 +314,72 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		}
 	}
 
+	private GameObject[] rackTilesFromPrediction(PredictionResult result) {
+		GameObject[] rack = new GameObject[rackRepresentation.Length];
+		bool[] dirty = new bool[rackRepresentation.Length];
+		int index = 0;
+
+		for (int i = 0; i < result.tiles.Length; i++) {
+
+			Tile tile = result.tiles [i];
+
+			for (int j = 0; j < rackRepresentation.Length; j++) {
+				GameObject tileObject = rackRepresentation [j];
+
+				GameObject canvas = tileObject.transform.FindChild ("TextCanvas").gameObject;
+				GameObject letter = canvas.transform.FindChild ("Letter").gameObject;
+				if ((dirty[j] == null || dirty[j] == false) && tile.getLetter ().ToString () == letter.GetComponent<Text> ().text) {
+					rack [index] = tileObject;
+					dirty [j] = true;
+					index += 1;
+					break;
+				}
+			}
+		}
+		return rack;
+	}
+
+	private void displayPrediction(PredictionResult result) {
+
+		List<GameObject> ghosts = new List<GameObject> ();
+		for (int i = 0; i < result.tiles.Length; i++) {
+			Tile tile = result.tiles [i];
+
+			float width = board.transform.FindChild ("BoardBox").gameObject.GetComponent<Collider> ().bounds.size.x;
+			float spaceWidth = width / boardConfig.dimension;
+			Vector3 boardOrigin = new Vector3 (board.transform.position.x + width / 2.0f, 0, board.transform.position.z - width / 2.0f);
+			GameObject surface = board.transform.FindChild ("Surface").gameObject;
+
+			Vector3 pos = new Vector3 (-result.coordinates [i].x * spaceWidth + boardOrigin.x - (spaceWidth / 2), surface.transform.position.y, result.coordinates [i].y * spaceWidth + boardOrigin.z + (spaceWidth / 2));
+			Quaternion rot = Quaternion.Euler (Vector3.up);
+			GameObject go = produceTile (tile.getLetter (), this.game.valueOf(tile), pos, rot);
+			// TODO: make ghost translucent.
+			// go.GetComponent<Renderer> ().material.color.a = 0.5f;
+			TilePrefab pf = go.GetComponent<TilePrefab> ();
+			pf.destinationPosition = pos;
+			pf.destinationRotation = rot;
+			ghosts.Add (go);
+		}
+		solution = ghosts.ToArray ();
+	}
+
+	private void placePrediction(PredictionResult result) {
+		
+		GameObject[] rack = rackTilesFromPrediction (result);
+
+		for (int i = 0; i < rack.Length; i++) {
+			GameObject tile = rack [i];
+			if (tile == null)
+				continue;
+			placeTileAt (tile, result.coordinates [i].x, result.coordinates [i].y);
+			float width = board.transform.FindChild ("BoardBox").gameObject.GetComponent<Collider> ().bounds.size.x;
+			float spaceWidth = width / boardConfig.dimension;
+			Vector3 boardOrigin = new Vector3 (board.transform.position.x + width / 2.0f, 0, board.transform.position.z - width / 2.0f);
+			GameObject surface = board.transform.FindChild ("Surface").gameObject;
+			tile.GetComponent<TilePrefab> ().destinationPosition = new Vector3 (-result.coordinates [i].x * spaceWidth + boardOrigin.x - (spaceWidth / 2), surface.transform.position.y, result.coordinates [i].y * spaceWidth + boardOrigin.z + (spaceWidth / 2));
+			tile.GetComponent<TilePrefab> ().destinationRotation = Quaternion.Euler (Vector3.up);
+		}
+	}
 	private void setupInitialState() {
 
 		int numTiles = rackConfig.maxTiles;

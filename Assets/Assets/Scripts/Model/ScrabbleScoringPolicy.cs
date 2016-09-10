@@ -53,8 +53,8 @@ public sealed class ScrabbleScoringPolicy {
 	
 		return score;
 	} 
-	
-	private int valueOf(char letter) {
+
+	public int valueOf(char letter) {
 		return getScore(letter);
 	}
 

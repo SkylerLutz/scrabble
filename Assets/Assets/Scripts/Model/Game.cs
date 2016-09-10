@@ -17,7 +17,7 @@ public interface ScrabbleGame {
 	void predict(Player player, Coordinate coordinate);
 	void solve(Player player);
 	int play(Player player, AbstractPlayerMove move);
-
+	int valueOf (Tile tile);
 	// void pass(Player player);
 	// String define(String word);
 	// void exchange(Player player, ArrayList<Tile> tiles);
@@ -50,6 +50,7 @@ public sealed class Game: ScrabbleGame {
 	// model objects
 	private PlayerMoveBroker broker;
 	private ScrabblePlayerMoveScoring scoring;
+	private ScrabbleScoringPolicy letterScoring;
 
 	// game objects
 	private Player[] players;
@@ -59,13 +60,14 @@ public sealed class Game: ScrabbleGame {
 	private ScrabbleGameConfiguration config;
 	private GameDelegate del;
 
+	
 	public Game(ScrabbleGameConfiguration config, ScrabbleBoard board, Player[] players, GameDelegate del) {
 		this.config = config;
 		this.del = del;
 		this.players = players;
 		this.scoreboard = new Scoreboard(players);
-		ScrabbleScoringPolicy policy = new ScrabbleScoringPolicy();
-		ScrabbleWordScoring wordScoring = new ScrabbleWordScoring(policy);
+		this.letterScoring = new ScrabbleScoringPolicy();
+		ScrabbleWordScoring wordScoring = new ScrabbleWordScoring(letterScoring);
 
 		Trie dict = new Trie();
 		this.scoring = new ScrabblePlayerMoveScoring(wordScoring, dict);
@@ -168,6 +170,10 @@ public sealed class Game: ScrabbleGame {
 //		}
 		updateTurn();
 		return score;
+	}
+
+	public int valueOf (Tile tile) {
+		return letterScoring.valueOf (tile.getLetter ());
 	}
 
 	private bool gameOver() {
