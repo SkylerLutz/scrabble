@@ -20,12 +20,6 @@ public class TilePrefab : MonoBehaviour {
 	public BoardConfiguration boardConfig;
 	public TileDelegate del;
 	public bool isFixed = false;
-//
-//	public void Start() {
-//		this.destinationPosition = transform.position;
-//		this.destinationScale = transform.localScale;
-//		this.destinationRotation = transform.rotation
-//	}
 
 	public void Update() {
 		if (!isDragging) {
@@ -37,8 +31,13 @@ public class TilePrefab : MonoBehaviour {
 	private Vector3 screenPoint;
 	private Vector3 offset;
 	private float originalDistance;
+
+	private float delta = 0;
+
 	public void OnMouseDown() {
 		if (isFixed) return;
+
+		delta = 0;
 
 		isDragging = true;
 
@@ -54,6 +53,8 @@ public class TilePrefab : MonoBehaviour {
 
 	public void OnMouseDrag() {
 		if (isFixed) return;
+
+		delta += Time.deltaTime;
 
 		// position tracking
 		Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
@@ -72,10 +73,17 @@ public class TilePrefab : MonoBehaviour {
 	public void OnMouseUp() {
 		if (isFixed) return;
 
+		Debug.Log ("dragged for " + delta + " time units.");
+
+		bool shouldReturn = false;
+		if (delta < 0.05f) { // return the tile to the rack
+			shouldReturn = true;
+		}
+
 		GameObject surface = board.transform.FindChild ("Surface").gameObject;
 		Plane plane = new Plane (surface.transform.up, surface.transform.position);
 		float distance = plane.GetDistanceToPoint (gameObject.transform.position);
-		if (distance < 3) {
+		if (distance < 3 && !shouldReturn) {
 			// on mouse up, position the tile appropriately (centered inside a square)
 
 			int dimension = boardConfig.dimension;

@@ -148,7 +148,9 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		p.board = board;
 		p.boardConfig = boardConfig;
 		p.destinationPosition = tileV3;
-		p.destinationRotation = tile.transform.rotation;
+//		p.destinationRotation = tile.transform.rotation;
+//		Debug.Log ("ROTATION: " + tile.transform.rotation.eulerAngles);
+		p.destinationRotation = Quaternion.Euler (new Vector3(90.0f, 0.0f, 0.0f));
 	}
 
 	// Tile Delegate Calls
@@ -160,11 +162,13 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 		// search fixed tiles at i, j
 		if (fixedPositions.Contains(new Coordinate(i, j))) {
+			Debug.Log ("You can't place that tile here, there is a fixed tile.");
 			return false;
 		}
 
 		// search for user placed tiles at i, j
 		if (playerMoveContextCoordinates.Contains (new Coordinate (i, j))) {
+			Debug.Log ("You can't place that tile here, you already put a tile here.");
 			return false;
 		}
 
@@ -281,7 +285,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			if (Physics.Raycast (ray, out hit)) {
-				if (hit.collider != null && hit.transform.tag.Contains ("prediction")) {
+				if (hit.transform.tag.Contains ("prediction")) {
 					PredictionResult result = null;
 
 					if (hit.transform.tag.Contains ("1") && activePredictions.Count > 0) {
@@ -303,6 +307,38 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 						commitMove ();
 					}
 				}
+				else if (hit.transform.tag == "tile") {
+
+					for (int i = 0; i < boardConfig.dimension; i++) {
+						for (int j = 0; j < boardConfig.dimension; j++) {
+							GameObject move = moveContext [i, j];
+							if (move == null)
+								continue;
+							GameObject instance = hit.transform.gameObject;
+							if (move.GetInstanceID () == instance.GetInstanceID ()) {
+								Debug.Log ("found the clicked tile");
+
+								moveContext [i, j] = null;
+								int index = playerMoveContextCoordinates.IndexOf(new Coordinate(i,j));
+								Debug.Log ("INDEX: " + index);
+								playerMoveContextCoordinates.RemoveAt(index);
+								playerMoveContextTiles.RemoveAt(index);
+
+								int rackIndex = insertTileToRack (instance);
+								if (rackIndex == -1) {
+									Destroy (instance);
+								} else {
+									setPositionForTileAtIndex (instance, rackIndex);
+								}
+
+								goto Outer;
+							}
+						}
+					}
+					Outer: 
+					Debug.Log ("put a tile back");
+				}
+				
 			}
 
 		}
@@ -445,7 +481,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		playerMoveContextTiles = new List<Tile> ();
 		playerMoveContextCoordinates = new List<Coordinate> ();
 
-		game.solve(player);
+		//game.solve(player);
 	}
 	public void predictionsDetermined(Player player, Coordinate coordinate, List<PredictionResult> predictions) {
 
