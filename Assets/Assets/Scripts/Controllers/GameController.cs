@@ -486,7 +486,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 		int numTiles = rackConfig.maxTiles;
 		int numResults = 3;
-		ScrabbleBoardConfiguration size = ScrabbleBoardConfiguration.STANDARD;
+		ScrabbleBoardConfiguration size = ScrabbleBoardConfiguration.LARGE;
 
 		Player p1 = new Player();
 		Player p2 = new Player();
