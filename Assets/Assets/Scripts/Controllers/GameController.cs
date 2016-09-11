@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 	// GameObjects
 	public GameObject rack;
+	public GameObject opponentRack;
 	public GameObject board;
 
 	public GameObject prediction1;
@@ -31,6 +32,8 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 	private GameObject[,] moveContext; // 2d array of tile views placed during this move
 	private GameObject[] solution; // array of tile views for a potential move
 	private GameObject[] rackRepresentation; // array of tile views on the player rack
+
+	private GameObject[] opponentRackRepresentation; 
 
 	private List<Tile> fixedTiles;
 	private List<Coordinate> fixedPositions;
@@ -137,8 +140,10 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		// TODO: setup initial state
 
 		rackRepresentation = new GameObject[rackConfig.maxTiles];
+		opponentRackRepresentation = new GameObject[rackConfig.maxTiles];
 		for (int i = 0; i < rackConfig.maxTiles; i++) {
 			rackRepresentation [i] = null;
+			opponentRackRepresentation [i] = null;
 		}
 
 		boardRepresentation = new GameObject[boardConfig.dimension,boardConfig.dimension];
@@ -161,6 +166,66 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 		playerMoveContextTiles = new List<Tile> ();
 		playerMoveContextCoordinates = new List<Coordinate> ();
+	}
+
+	private int addTileOpponent(Tile tile) {
+		// TODO: make the tiles come from a sensible vector3 origin
+
+		// TODO: Get tile point value
+		Debug.Log("opponent: " + tile);
+		GameObject instance = produceTile (tile.getLetter (), this.game.valueOf (tile), Vector3.up, opponentRack.transform.rotation);
+		foreach (TilePrefab pf in instance.GetComponents<TilePrefab> ()) {
+			pf.isFixed = true;
+//			pf.destinationRotation = Quaternion.Euler (new Vector3 (0.0f, 0.0f, 0.0f));
+		}
+
+		int index = insertTileToOpponentRack (instance);
+		if (index == -1) {
+			Destroy (instance);
+			return -1;
+		} else {
+			setPositionForOpponentTileAtIndex (instance, index);
+		}
+		return index;
+	}
+	// return the rack index the tile was inserted into, or negative -1 if it could not be inserted.
+	private int insertTileToOpponentRack(GameObject tile) {
+		for (int i = 0; i < opponentRackRepresentation.Length; i++) {
+			if (opponentRackRepresentation [i] == null) {
+				opponentRackRepresentation [i] = tile;
+				return i;
+			}
+		}
+		return -1; 
+	}
+	private void setPositionForOpponentTileAtIndex(GameObject tile, int index) {
+
+		// Calculate x position of new tile on the rack
+		float width = opponentRack.GetComponent<Collider> ().bounds.size.x;
+		float origin = opponentRack.transform.position.x + width / 2.0f;
+
+		// TODO: add half the width of a tile?
+		float tilePositionX = -index * (width / rackConfig.maxTiles) + origin;
+		Vector3 tileV3 = new Vector3(tilePositionX, opponentRack.transform.position.y, opponentRack.transform.position.z);
+
+		// Rotation of new tile is the same as the Rack's rotation
+
+		// TODO: Concavity (rotation)
+		//		Vector3 right = new Vector3 (0, 0, Mathf.Lerp(75.0f, -75.0f, (float)(index + 1) / (float)config.maxTiles));
+		//		Debug.Log (right);
+		//		Vector3 tileOrigin = new Vector3 (tileV3.x, tileV3.y, tileV3.z - 1);
+		//		tileObject.destination = tileV3;
+		//		tileObject.orientation = right;
+
+		// position
+		TilePrefab p = tile.GetComponent<TilePrefab>();
+		p.del = this;
+		p.board = board;
+		p.boardConfig = boardConfig;
+		p.destinationPosition = tileV3;
+//		p.destinationRotation = tile.transform.rotation;
+//		Debug.Log ("ROTATION: " + tile.transform.rotation.eulerAngles);
+		p.destinationRotation = Quaternion.Euler (new Vector3(90.0f, 180.0f, 0.0f));
 	}
 
 	private int addTile(Tile tile) {
@@ -213,8 +278,8 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		p.board = board;
 		p.boardConfig = boardConfig;
 		p.destinationPosition = tileV3;
-//		p.destinationRotation = tile.transform.rotation;
-//		Debug.Log ("ROTATION: " + tile.transform.rotation.eulerAngles);
+		//		p.destinationRotation = tile.transform.rotation;
+		//		Debug.Log ("ROTATION: " + tile.transform.rotation.eulerAngles);
 		p.destinationRotation = Quaternion.Euler (new Vector3(90.0f, 0.0f, 0.0f));
 	}
 
@@ -544,9 +609,18 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		}
 
 
+
 		this.game = new Game(new ScrabbleGameConfiguration(numResults, new PlayerConfiguration(numTiles)), board, players, this);
 		this.game.start();
 
+		addTileOpponent (new Tile (TileType.LETTER, 'Y'));
+		addTileOpponent (new Tile (TileType.LETTER, 'R'));
+		addTileOpponent (new Tile (TileType.LETTER, 'T'));
+
+		addTileOpponent (new Tile (TileType.LETTER, 'E'));
+		addTileOpponent (new Tile (TileType.LETTER, 'C'));
+		addTileOpponent (new Tile (TileType.LETTER, 'I'));
+		addTileOpponent (new Tile (TileType.LETTER, 'N'));
 	}
 
 	private void syncViewBoardToModelBoard() {
