@@ -195,7 +195,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		float origin = rack.transform.position.x + width / 2.0f;
 
 		// TODO: add half the width of a tile?
-		float tilePositionX = -index * (width / rackConfig.maxTiles) + origin; 
+		float tilePositionX = -index * (width / rackConfig.maxTiles) + origin;
 		Vector3 tileV3 = new Vector3(tilePositionX, rack.transform.position.y, rack.transform.position.z);
 
 		// Rotation of new tile is the same as the Rack's rotation
@@ -289,7 +289,23 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		playerMoveContextCoordinates.Add (c);
 	}
 
-	private void commitMove() {
+	public void clear() {
+		for (int i = 0; i < boardConfig.dimension; i++) {
+			for (int j = 0; j < boardConfig.dimension; j++) {
+				GameObject tile = moveContext [i, j];
+				if (tile != null) {
+					returnTileToRack (i, j);
+				}
+			}
+		}
+	}
+
+	public void solvePuzzle() {
+		prediction1.GetComponent<TextMesh> ().text = "Solving...";
+		this.game.solve (active);
+	}
+
+	public void commitMove() {
 		PlayerMove move = new PlayerMove (playerMoveContextTiles.ToArray(), playerMoveContextCoordinates.ToArray());
 
 		Debug.Log ("committing the move: " + move);
@@ -383,18 +399,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 							if (move.GetInstanceID () == instance.GetInstanceID ()) {
 								Debug.Log ("found the clicked tile");
 
-								moveContext [i, j] = null;
-								int index = playerMoveContextCoordinates.IndexOf(new Coordinate(i,j));
-								Debug.Log ("INDEX: " + index);
-								playerMoveContextCoordinates.RemoveAt(index);
-								playerMoveContextTiles.RemoveAt(index);
-
-								int rackIndex = insertTileToRack (instance);
-								if (rackIndex == -1) {
-									Destroy (instance);
-								} else {
-									setPositionForTileAtIndex (instance, rackIndex);
-								}
+								returnTileToRack (i, j);
 
 								goto Outer;
 							}
@@ -412,10 +417,26 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 			// TODO: save button
 //			commitMove();
 			Debug.Log("Solving...");
-//			game.solve(active);
+			game.solve(active);
 		}
 	}
 
+	private void returnTileToRack(int i, int j) {
+		GameObject instance = moveContext [i, j];
+		moveContext [i, j] = null;
+		int index = playerMoveContextCoordinates.IndexOf(new Coordinate(i,j));
+
+		playerMoveContextCoordinates.RemoveAt(index);
+		playerMoveContextTiles.RemoveAt(index);
+
+		int rackIndex = insertTileToRack (instance);
+		if (rackIndex == -1) {
+			Destroy (instance);
+		} else {
+			setPositionForTileAtIndex (instance, rackIndex);
+		}
+
+	}
 	private GameObject[] rackTilesFromPrediction(PredictionResult result) {
 		GameObject[] rack = new GameObject[rackRepresentation.Length];
 		bool[] dirty = new bool[rackRepresentation.Length];
@@ -495,11 +516,11 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 		ScrabbleBoard board = new ScrabbleBoard(size);
 		// previously placed tiles
-		board.setTile(new Tile(TileType.LETTER, 'H'), 3, 2);
-		board.setTile(new Tile(TileType.LETTER, 'E'), 3, 3);
-		board.setTile(new Tile(TileType.LETTER, 'L'), 3, 4);
+		board.setTile(new Tile(TileType.LETTER, 'H'), 3, 3);
+		board.setTile(new Tile(TileType.LETTER, 'E'), 3, 4);
 		board.setTile(new Tile(TileType.LETTER, 'L'), 3, 5);
-		board.setTile(new Tile(TileType.LETTER, 'O'), 3, 6);
+		board.setTile(new Tile(TileType.LETTER, 'L'), 3, 6);
+		board.setTile(new Tile(TileType.LETTER, 'O'), 3, 7);
 
 
 		for (int i = 0; i < board.dimension; i++) {
@@ -567,6 +588,10 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		playerMoveContextTiles = new List<Tile> ();
 		playerMoveContextCoordinates = new List<Coordinate> ();
 
+		prediction1.GetComponent<TextMesh> ().text = "";
+		prediction2.GetComponent<TextMesh> ().text = "";
+		prediction3.GetComponent<TextMesh> ().text = "";
+
 		//game.solve(player);
 	}
 	public void predictionsDetermined(Player player, Coordinate coordinate, List<PredictionResult> predictions) {
@@ -580,8 +605,8 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 		if (predictions.Count > 0) {
 			prediction1.GetComponent<TextMesh> ().text = predictions [0].ToString ();
-			placePrediction(predictions[0]);
-			commitMove ();
+//			placePrediction(predictions[0]);
+//			commitMove ();
 		}
 		if (predictions.Count > 1) {
 			prediction2.GetComponent<TextMesh> ().text = predictions [1].ToString ();

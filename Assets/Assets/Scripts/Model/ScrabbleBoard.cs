@@ -170,7 +170,7 @@ public class ScrabbleBoard {
 		this.spaces [1, 1] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
 		this.spaces [1, 2] = new TileSpace(TileSpaceType.NORMAL);
 		this.spaces [1, 3] = new TileSpace(TileSpaceType.NORMAL);
-		this.spaces [1, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [1, 4] = new TileSpace(TileSpaceType.DOUBLE_LETTER_SCORE);
 		this.spaces [1, 5] = new TileSpace(TileSpaceType.NORMAL);
 		this.spaces [1, 6] = new TileSpace(TileSpaceType.NORMAL);
 		this.spaces [1, 7] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
@@ -197,13 +197,13 @@ public class ScrabbleBoard {
 		this.spaces [3, 8] = new TileSpace(TileSpaceType.NORMAL);
 
 		this.spaces [4, 0] = new TileSpace (TileSpaceType.NORMAL);
-		this.spaces [4, 1] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [4, 1] = new TileSpace(TileSpaceType.TRIPLE_LETTER_SCORE);
 		this.spaces [4, 2] = new TileSpace(TileSpaceType.NORMAL);
 		this.spaces [4, 3] = new TileSpace(TileSpaceType.NORMAL);
 		this.spaces [4, 4] = new TileSpace(TileSpaceType.CENTER);
 		this.spaces [4, 5] = new TileSpace(TileSpaceType.NORMAL);
 		this.spaces [4, 6] = new TileSpace(TileSpaceType.NORMAL);
-		this.spaces [4, 7] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [4, 7] = new TileSpace(TileSpaceType.TRIPLE_LETTER_SCORE);
 		this.spaces [4, 8] = new TileSpace(TileSpaceType.NORMAL);
 
 		this.spaces [5, 0] = new TileSpace (TileSpaceType.NORMAL);
@@ -233,7 +233,7 @@ public class ScrabbleBoard {
 		this.spaces [7, 1] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
 		this.spaces [7, 2] = new TileSpace(TileSpaceType.NORMAL);
 		this.spaces [7, 3] = new TileSpace(TileSpaceType.NORMAL);
-		this.spaces [7, 4] = new TileSpace(TileSpaceType.NORMAL);
+		this.spaces [7, 4] = new TileSpace(TileSpaceType.DOUBLE_LETTER_SCORE);
 		this.spaces [7, 5] = new TileSpace(TileSpaceType.NORMAL);
 		this.spaces [7, 6] = new TileSpace(TileSpaceType.NORMAL);
 		this.spaces [7, 7] = new TileSpace(TileSpaceType.DOUBLE_WORD_SCORE);
@@ -253,6 +253,9 @@ public class ScrabbleBoard {
 	public TileSpace getSpace(int i, int j) {
 		if ((i < 0 || i >= dimension) || (j < 0 || j >= dimension)) {
 			return null;
+		}
+		if (tiles [i, j] != null) {
+			return new TileSpace(TileSpaceType.NORMAL);
 		}
 		return spaces[i,j];
 	}

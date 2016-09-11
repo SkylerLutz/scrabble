@@ -49,6 +49,7 @@
      <Compile Include="Assets\Assets\Scripts\Configuration\RackConfiguration.cs" />
      <Compile Include="Assets\Assets\Scripts\Controllers\BoardController.cs" />
      <Compile Include="Assets\Assets\Scripts\Controllers\GameController.cs" />
+     <Compile Include="Assets\Assets\Scripts\Controllers\MenuController.cs" />
      <Compile Include="Assets\Assets\Scripts\Controllers\RackController.cs" />
      <Compile Include="Assets\Assets\Scripts\Controllers\TileMovementController.cs" />
      <Compile Include="Assets\Assets\Scripts\Factories\TileFactory.cs" />
