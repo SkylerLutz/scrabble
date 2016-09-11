@@ -24,6 +24,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 	// Prefabs
 	public GameObject tilePrefab;
+	public GameObject spacePrefab;
 
 	// Internal/Intermediate state
 	private GameObject[,] boardRepresentation; // 2d array of tile views
@@ -41,12 +42,70 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 	public BoardConfiguration boardConfig;
 
 	// Factories
+	public GameObject produceSpace(TileSpaceType type, Vector3 position) {
+
+		GameObject space = (GameObject)Instantiate(spacePrefab, position, Quaternion.Euler(new Vector3(0.0f, 0.0f, 0.0f)), view);
+
+		TextMesh label = space.transform.FindChild("Label").gameObject.GetComponent<TextMesh>();
+		GameObject plane = space.transform.FindChild ("Plane").gameObject;
+		string text = null;
+		Color c = new Color ();
+		c.a = 1.0f;
+
+		switch (type) {
+		case TileSpaceType.CENTER:
+			text = "";
+			c.r = 235.0f / 255.0f;
+			c.g = 152.0f / 255.0f;
+			c.b = 163.0f / 255.0f;
+			break;
+		case TileSpaceType.DOUBLE_LETTER_SCORE:
+			text = "DOUBLE\nLETTER\nSCORE";
+			c.r = 186.0f / 255.0f;
+			c.g = 220.0f / 255.0f;
+			c.b = 238.0f / 255.0f;
+			break;
+		case TileSpaceType.DOUBLE_WORD_SCORE:
+			text = "DOUBLE\nWORD\nSCORE";
+			c.r = 235.0f / 255.0f;
+			c.g = 152.0f / 255.0f;
+			c.b = 163.0f / 255.0f;
+			break;
+		case TileSpaceType.NORMAL:
+			text = "";
+			c.r = 170.0f / 255.0f;
+			c.g = 172.0f / 255.0f;
+			c.b = 136.0f / 255.0f;
+			break;
+
+		case TileSpaceType.TRIPLE_LETTER_SCORE:
+			text = "TRIPLE\nLETTER\nSCORE";
+			c.r = 89.0f / 255.0f;
+			c.g = 160.0f / 255.0f;
+			c.b = 205.0f / 255.0f;
+			break;
+
+		case TileSpaceType.TRIPLE_WORD_SCORE:
+			text = "TRIPLE\nWORD\nSCORE";
+			c.r = 226.0f / 255.0f;
+			c.g = 42.0f / 255.0f;
+			c.b = 62.0f / 255.0f;
+			break;
+		}
+
+		label.text = text;
+		plane.GetComponent<MeshRenderer> ().material.color = c;
+//		label.color = c;
+
+		return space;
+	}
+
 	public GameObject produceTile(char letter, int pointValue, Vector3 position, Quaternion rotation) {
 
 		GameObject tile = (GameObject)Instantiate(tilePrefab, position, rotation, view);
-//		TilePrefab pf = tile.GetComponent<TilePrefab> ();
-//		pf.destinationPosition = position;
-//		pf.destinationRotation = rotation;
+		//		TilePrefab pf = tile.GetComponent<TilePrefab> ();
+		//		pf.destinationPosition = position;
+		//		pf.destinationRotation = rotation;
 
 		Text letterLabel = tile.transform.FindChild("TextCanvas").gameObject.transform.FindChild("Letter").gameObject.GetComponent<Text>();
 		Text valueLabel = tile.transform.FindChild("TextCanvas").gameObject.transform.FindChild("Value").gameObject.GetComponent<Text>();
@@ -62,7 +121,6 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		valueLabel.color = c;
 		return tile;
 	}
-
 
 	// Lifecycle methods
 	void Start() {
@@ -354,7 +412,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 			// TODO: save button
 //			commitMove();
 			Debug.Log("Solving...");
-			game.solve(active);
+//			game.solve(active);
 		}
 	}
 
@@ -443,6 +501,28 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 		board.setTile(new Tile(TileType.LETTER, 'L'), 3, 5);
 		board.setTile(new Tile(TileType.LETTER, 'O'), 3, 6);
 
+
+		for (int i = 0; i < board.dimension; i++) {
+			for (int j = 0; j < board.dimension; j++) {
+				int dimension = boardConfig.dimension;
+
+				// Calculate x position of new tile on the rack
+				float width = this.board.transform.FindChild ("BoardBox").gameObject.GetComponent<Collider> ().bounds.size.x;
+				Vector3 boardOrigin = new Vector3 (this.board.transform.position.x + width / 2.0f, 0, this.board.transform.position.z - width / 2.0f);
+
+				float spaceWidth = width / dimension;
+				GameObject surface = this.board.transform.FindChild ("Surface").gameObject;
+
+				Coordinate coordinate = new Coordinate (i, j);
+
+				Vector3 centerOffset = new Vector3 (-(spaceWidth / 2.0f), 0, (spaceWidth / 2.0f));
+				Vector3 oneOver = new Vector3 (-coordinate.x * spaceWidth,0,coordinate.y * spaceWidth);
+
+				produceSpace (board.getSpace (i, j).type, boardOrigin + centerOffset + oneOver + surface.transform.position);
+			}
+		}
+
+
 		this.game = new Game(new ScrabbleGameConfiguration(numResults, new PlayerConfiguration(numTiles)), board, players, this);
 		this.game.start();
 
@@ -457,7 +537,6 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 				GameObject go = moveContext [i, j];
 				if (go != null) {
-					Debug.Log ("found game object at (" + i + ", " + j + ")");
 					moveContext [i, j] = null;
 					boardRepresentation [i, j] = go;
 				}
