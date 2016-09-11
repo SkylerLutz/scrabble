@@ -53,6 +53,13 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 		letterLabel.text = "" + letter;
 		valueLabel.text = pointValue.ToString();
+		Color c = new Color ();
+		c.a = 1.0f;
+		c.r = 227.0f / 255.0f;
+		c.g = 223.0f / 255.0f;
+		c.b = 168.0f / 255.0f;
+		letterLabel.color = c;
+		valueLabel.color = c;
 		return tile;
 	}
 
