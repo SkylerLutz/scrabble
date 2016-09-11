@@ -23,6 +23,8 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 	public GameObject prediction2;
 	public GameObject prediction3;
 
+	public GameObject score;
+
 	// Prefabs
 	public GameObject tilePrefab;
 	public GameObject spacePrefab;
@@ -481,8 +483,8 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 
 			// TODO: save button
 //			commitMove();
-			Debug.Log("Solving...");
-			game.solve(active);
+//			Debug.Log("Solving...");
+//			game.solve(active);
 		}
 	}
 
@@ -634,6 +636,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 				if (go != null) {
 					moveContext [i, j] = null;
 					boardRepresentation [i, j] = go;
+					go.GetComponent<TilePrefab> ().isFixed = true;
 				}
 
 
@@ -645,6 +648,11 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 				}
 			}
 		}
+
+
+		playerMoveContextTiles = new List<Tile> ();
+		playerMoveContextCoordinates = new List<Coordinate> ();
+
 	}
 	// Game Callbacks
 	public void playerDrewTiles(Player player, Tile[] drawnTiles) {
@@ -694,6 +702,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 	public void playerScored(Player player, int score) { 
 		Debug.Log ("Player " + player + " scored " + score + " points.");
 		Debug.Log (game.board);
+
 	}
 	public void playerWon(Player player) {
 		//		System.exit(0);
@@ -701,5 +710,7 @@ public class GameController : MonoBehaviour, TileDelegate, GameDelegate {
 	public void scoreboardUpdated(Scoreboard scoreboard) {
 		// stub
 //		Debug.Log(scoreboard);
+		string playerScore = scoreboard.getScore(active).ToString();
+		score.GetComponent<TextMesh> ().text = playerScore + " points";
 	}
 }
